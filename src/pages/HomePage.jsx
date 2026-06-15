@@ -3,7 +3,7 @@ import { SERVICES } from './services';
 
 /* ── Reveal hook ────────────────────────────────────────── */
 const useReveal = (threshold = 0.12) => {
-  const ref  = useRef(null);
+  const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -73,14 +73,14 @@ const ServicePreviewCard = ({ service, index, navigate }) => {
    HOME PAGE
    ══════════════════════════════════════════════════════════ */
 const HomePage = ({ navigate }) => {
-  const [whyRef,   whyVisible]   = useReveal(0.1);
-  const [ctaRef,   ctaVisible]   = useReveal(0.1);
+  const [whyRef, whyVisible]   = useReveal(0.1);
+  const [ctaRef, ctaVisible]   = useReveal(0.1);
   const [stripRef, stripVisible] = useReveal(0.1);
 
   const STRIP_ITEMS = [
-    'Drone Aerial Survey', 'LiDAR Mapping', 'GIS Analysis',
-    'Photogrammetry', 'Flood Mapping', 'Volumetric Analysis',
-    'Cadastral Survey', 'Project Monitoring', '3D Reality Model',
+    'Drone Aerial Survey','LiDAR Mapping','GIS Analysis',
+    'Photogrammetry','Flood Mapping','Volumetric Analysis',
+    'Cadastral Survey','Project Monitoring','3D Reality Model',
     'DGCA Certified Operations',
   ];
 
@@ -142,7 +142,7 @@ const HomePage = ({ navigate }) => {
         <div className="container">
           <div className="hero-inner">
 
-            {/* Left: Content */}
+            {/* LEFT: Content */}
             <div className="hero-content">
               <div className="hero-badge">
                 <div className="hero-badge-dot">
@@ -179,80 +179,19 @@ const HomePage = ({ navigate }) => {
                   Get a Free Quote
                 </button>
               </div>
-
-              <div className="hero-stats">
-                <div className="hero-stat">
-                  <span className="hero-stat-num">
-                    <Counter target={120} suffix="+" />
-                  </span>
-                  <span className="hero-stat-label">Projects Done</span>
-                </div>
-                <div className="hero-stat-divider" />
-                <div className="hero-stat">
-                  <span className="hero-stat-num">
-                    <Counter target={50} suffix="+" />
-                  </span>
-                  <span className="hero-stat-label">Happy Clients</span>
-                </div>
-                <div className="hero-stat-divider" />
-                <div className="hero-stat">
-                  <span className="hero-stat-num">
-                    <Counter target={5} suffix="+" />
-                  </span>
-                  <span className="hero-stat-label">Years Experience</span>
-                </div>
-              </div>
             </div>
 
-            {/* Right: Visual card */}
+            {/* RIGHT: Real drone image */}
             <div className="hero-visual">
-              <div className="hero-card-stack">
-                <div className="hero-main-card">
-                  <div className="hero-map-placeholder">
-                    <div className="map-grid-overlay" />
-                    {/* Contour rings */}
-                    {[80, 120, 160].map((s, i) => (
-                      <div
-                        key={i}
-                        className="map-contour"
-                        style={{ width: s, height: s, opacity: 0.3 - i * 0.08 }}
-                      />
-                    ))}
-                    <div className="map-pin" />
-                  </div>
-                  <div className="hero-card-meta">
-                    <div className="hero-card-info">
-                      <h4>Active Survey Zone</h4>
-                      <p>Coimbatore, Tamil Nadu</p>
-                    </div>
-                    <div className="hero-card-badge">Live</div>
-                  </div>
-                </div>
-
-                {/* Float cards */}
-                <div className="hero-float-card card-top-right">
-                  <div className="float-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
-                  </div>
-                  <div className="float-card-label">Accuracy</div>
-                  <div className="float-card-value">±2 cm</div>
-                </div>
-
-                <div className="hero-float-card card-bottom-left">
-                  <div className="float-card-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                  </div>
-                  <div className="float-card-label">Avg. Turnaround</div>
-                  <div className="float-card-value">48 hrs</div>
-                </div>
+              <div className="hero-img-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=900&q=80"
+                  alt="Drone surveying landscape"
+                  className="hero-drone-img"
+                />
+                <div className="hero-img-overlay" />
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -280,9 +219,9 @@ const HomePage = ({ navigate }) => {
         <div className="container">
           <div className="stats-band-grid">
             {[
-              { num: 120, suffix: '+', label: 'Projects Completed' },
-              { num: 50,  suffix: '+', label: 'Clients Served'     },
-              { num: 9,   suffix: '',  label: 'Service Categories' },
+              { num: 120, suffix: '+', label: 'Projects Completed'  },
+              { num: 50,  suffix: '+', label: 'Clients Served'      },
+              { num: 9,   suffix: '',  label: 'Service Categories'  },
               { num: 5,   suffix: '+', label: 'Years of Excellence' },
             ].map((s, i) => (
               <div key={i} className="stats-band-item">
@@ -314,20 +253,12 @@ const HomePage = ({ navigate }) => {
 
           <div className="home-svc-grid">
             {SERVICES.slice(0, 6).map((s, i) => (
-              <ServicePreviewCard
-                key={s.id}
-                service={s}
-                index={i}
-                navigate={navigate}
-              />
+              <ServicePreviewCard key={s.id} service={s} index={i} navigate={navigate} />
             ))}
           </div>
 
           <div className="home-services-footer">
-            <button
-              className="btn-teal home-view-all-btn"
-              onClick={() => navigate('services')}
-            >
+            <button className="btn-teal home-view-all-btn" onClick={() => navigate('services')}>
               View All 9 Services
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="5" y1="12" x2="19" y2="12"/>
@@ -341,31 +272,20 @@ const HomePage = ({ navigate }) => {
       {/* ══ WHY US ════════════════════════════════════════ */}
       <section className="why-section">
         <div className="container">
-          <div
-            ref={whyRef}
-            className={`why-inner ${whyVisible ? 'revealed' : ''}`}
-          >
-            {/* Left: visual card */}
+          <div ref={whyRef} className={`why-inner ${whyVisible ? 'revealed' : ''}`}>
+
+            {/* LEFT: Real project aerial image */}
             <div className="why-visual">
-              <div className="why-visual-card">
-                <div className="why-card-stat">
-                  <div className="big-num">
-                    120<span>+</span>
-                  </div>
-                  <p>Projects delivered across Tamil Nadu and South India</p>
+              <div className="why-img-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+                  alt="Aerial survey project"
+                  className="why-project-img"
+                />
                 </div>
-              </div>
-              <div className="why-float-stat stat-right">
-                <div className="stat-n">±2cm</div>
-                <div className="stat-l">Survey Accuracy</div>
-              </div>
-              <div className="why-float-stat stat-bottom">
-                <div className="stat-n">DGCA</div>
-                <div className="stat-l">Certified Pilots</div>
-              </div>
             </div>
 
-            {/* Right: features */}
+            {/* RIGHT: Features */}
             <div className="why-content">
               <span className="section-tag">Why Choose Us</span>
               <h2 className="section-title">
@@ -400,6 +320,7 @@ const HomePage = ({ navigate }) => {
                 </svg>
               </button>
             </div>
+
           </div>
         </div>
       </section>
@@ -407,10 +328,7 @@ const HomePage = ({ navigate }) => {
       {/* ══ BOTTOM CTA ════════════════════════════════════ */}
       <section className="cta-section">
         <div className="container">
-          <div
-            ref={ctaRef}
-            className={`cta-inner ${ctaVisible ? 'revealed' : ''}`}
-          >
+          <div ref={ctaRef} className={`cta-inner ${ctaVisible ? 'revealed' : ''}`}>
             <div className="cta-text">
               <span className="section-tag">Start Your Project</span>
               <h2>Ready to Survey Your Site?</h2>

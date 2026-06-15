@@ -1,185 +1,242 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-function useReveal() {
+const useReveal = (threshold = 0.12) => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
     const obs = new IntersectionObserver(
-      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.12 }
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
     );
-    els.forEach(el => obs.observe(el));
+    if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
-}
+  return [ref, visible];
+};
 
-const IconTarget  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
-const IconEye     = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
-const IconMap     = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>;
-const IconShield  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
-const IconAward   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>;
-const IconGlobe   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>;
-const IconArrow   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
-const IconDrone   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0"/><path d="M4.93 4.93l2.83 2.83M16.24 7.76l2.83-2.83M7.76 16.24l-2.83 2.83M19.07 19.07l-2.83-2.83"/><circle cx="5" cy="5" r="1.5"/><circle cx="19" cy="5" r="1.5"/><circle cx="5" cy="19" r="1.5"/><circle cx="19" cy="19" r="1.5"/></svg>;
-const IconCheck   = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+const Counter = ({ target, suffix = '', duration = 1800 }) => {
+  const [count, setCount] = useState(0);
+  const [ref, visible] = useReveal(0.3);
+  useEffect(() => {
+    if (!visible) return;
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(start));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [visible, target, duration]);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
 
-const timeline = [
-  { year: '2020', title: 'Company Founded', desc: 'Leona Tech established in Chennai with a small team of passionate geospatial engineers and a single survey drone.', active: false },
-  { year: '2021', title: 'First Major Contract', desc: 'Secured our first large-scale infrastructure survey contract — 1,200 hectares for a highway development project.', active: false },
-  { year: '2022', title: 'DGCA Certification', desc: 'Achieved full DGCA certification for all pilot operators. Expanded fleet to 6 advanced UAV systems.', active: false },
-  { year: '2023', title: 'GIS Lab Established', desc: 'Opened a dedicated GIS processing lab with advanced photogrammetry and LiDAR processing capabilities.', active: false },
-  { year: '2024', title: '200+ Projects Milestone', desc: 'Crossed 200 completed survey missions and 50+ satisfied clients across Tamil Nadu, Karnataka, and Andhra Pradesh.', active: true },
-];
+const AboutPage = ({ navigate }) => {
+  const [heroRef,    heroVisible]    = useReveal(0.05);
+  const [storyRef,   storyVisible]   = useReveal(0.1);
+  const [missionRef, missionVisible] = useReveal(0.1);
+  const [teamRef,    teamVisible]    = useReveal(0.1);
+  const [certsRef,   certsVisible]   = useReveal(0.1);
 
-const team = [
-  { name: 'Demo Lead', role: 'Founder & CEO', bio: 'Geospatial engineering expert with 10+ years in drone survey and GIS. Certified remote pilot and licensed surveyor.', initials: 'DL' },
-  { name: 'Demo Engineer', role: 'Chief Survey Officer', bio: 'Specializes in photogrammetry and 3D reconstruction. Led 100+ large-scale survey missions across South India.', initials: 'DE' },
-  { name: 'Demo Analyst', role: 'GIS Analyst Lead', bio: 'GIS software specialist with expertise in QGIS, ArcGIS, and custom geospatial data pipelines for clients.', initials: 'DA' },
-];
+  const TEAM = [
+    { initials: 'RK', name: 'Rajesh Kumar',   role: 'CEO & Founder',        bio: 'GIS expert with 10+ years in geospatial technology and UAV operations across South India.' },
+    { initials: 'PM', name: 'Priya Meenakshi', role: 'Head of Operations',   bio: 'Specialises in large-scale drone survey planning, regulatory compliance, and project delivery.' },
+    { initials: 'AV', name: 'Arun Vijay',      role: 'Lead GIS Analyst',     bio: 'Expert in photogrammetry, LiDAR processing, and GIS database development for infrastructure.' },
+  ];
 
-const certs = [
-  { title: 'DGCA Certified', sub: 'Drone Operations', icon: <IconShield /> },
-  { title: 'ISO 9001:2015', sub: 'Quality Management', icon: <IconAward /> },
-  { title: 'NSDI Compliant', sub: 'Spatial Data Standards', icon: <IconGlobe /> },
-  { title: 'Survey of India', sub: 'Licensed Partner', icon: <IconMap /> },
-];
+  const CERTS = [
+    { icon: '🛡️', title: 'DGCA Certified',     sub: 'Drone Operations License'    },
+    { icon: '📡', title: 'Remote Pilot',        sub: 'RPTO Certified Pilots'       },
+    { icon: '🗺️', title: 'GIS Professional',   sub: 'Certified Analysts'          },
+    { icon: '✅', title: 'ISO Compliant',       sub: 'Quality Management'          },
+    { icon: '🏛️', title: 'Govt. Empanelled',   sub: 'State & Central Bodies'      },
+  ];
 
-export default function AboutPage({ navigate }) {
-  useReveal();
+  const TIMELINE = [
+    { year: '2020', title: 'Company Founded',        desc: 'Started in Chennai with a vision to modernise India\'s surveying industry using drones.',  active: false },
+    { year: '2021', title: 'First Major Contract',   desc: 'Delivered topographical surveys for 3 municipal corporations in Tamil Nadu.',               active: false },
+    { year: '2022', title: 'DGCA Certification',     desc: 'Obtained full DGCA drone operation licenses and expanded to a fleet of 8 UAVs.',            active: false },
+    { year: '2023', title: 'GIS Division Launch',    desc: 'Launched dedicated GIS analysis and 3D modelling services for urban planning clients.',     active: false },
+    { year: '2024', title: '100+ Projects Milestone',desc: 'Crossed 100 successful project deliveries across infrastructure, water, and mining sectors.',active: true  },
+  ];
 
   return (
-    <main>
-      {/* ══ ABOUT HERO ══ */}
-      <section className="about-hero">
+    <div className="about-page">
+
+      {/* ══ HERO ══════════════════════════════════════════ */}
+      <section ref={heroRef} className={`about-hero ${heroVisible ? 'revealed' : ''}`}>
         <div className="container">
           <div className="about-hero-inner">
+
+            {/* LEFT: Content */}
             <div className="about-hero-content">
-              <div className="section-tag">About Leona Tech</div>
+              <span className="section-tag">About Leona Tech</span>
               <h1 className="section-title">
                 Mapping India's Future,<br />
                 <span>One Survey at a Time</span>
               </h1>
-              <p className="section-subtitle">
-                Founded in Chennai, Leona Tech & Geo Solutions Pvt Ltd is a technology-driven geospatial services company. We harness the power of advanced UAVs and GIS technology to deliver precise, actionable spatial data for India's growing infrastructure needs.
+              <p className="section-subtitle" style={{ marginBottom: '32px' }}>
+                Founded in Chennai, Leona Tech & Geo Solutions Pvt Ltd is a
+                technology-driven geospatial services company. We harness the
+                power of advanced UAVs and GIS technology to deliver precise,
+                actionable spatial data for India's growing infrastructure needs.
               </p>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
+              <div className="about-hero-actions">
                 <button className="btn-teal" onClick={() => navigate('contact')}>
-                  Work With Us <IconArrow />
+                  Work With Us
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
                 </button>
-                <button className="btn-secondary">
-                  View Projects
+                <button className="btn-secondary" onClick={() => navigate('services')}>
+                  View Services
                 </button>
               </div>
             </div>
 
-            {/* Visual */}
+            {/* RIGHT: Clean drone image, no badges */}
             <div className="about-hero-visual">
-              <div className="about-img-card">
-                <div className="about-img-pattern" />
-                <div className="about-img-icon">
-                  <IconDrone />
-                </div>
-              </div>
-              <div className="about-float f1">
-                <div className="about-float-label">Est.</div>
-                <div className="about-float-val">2020</div>
-              </div>
-              <div className="about-float f2">
-                <div className="about-float-label">HQ</div>
-                <div className="about-float-val">Chennai, TN</div>
+              <div className="about-hero-img-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=900&q=80"
+                  alt="Drone in action over survey site"
+                  className="about-hero-img"
+                />
+                <div className="about-hero-img-overlay" />
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* ══ STORY + TIMELINE ══ */}
+      {/* ══ STATS ═════════════════════════════════════════ */}
+      <section className="stats-band">
+        <div className="container">
+          <div className="stats-band-grid">
+            {[
+              { num: 120, suffix: '+', label: 'Projects Completed'  },
+              { num: 50,  suffix: '+', label: 'Clients Served'      },
+              { num: 5,   suffix: '+', label: 'Years Experience'    },
+              { num: 9,   suffix: '',  label: 'Service Categories'  },
+            ].map((s, i) => (
+              <div key={i} className="stats-band-item">
+                <div className="stats-band-num">
+                  <Counter target={s.num} suffix={s.suffix} />
+                </div>
+                <div className="stats-band-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ STORY + TIMELINE ══════════════════════════════ */}
       <section className="story-section">
         <div className="container">
-          <div className="story-inner">
-            {/* Story text */}
-            <div className="story-content reveal">
-              <div className="section-tag">Our Story</div>
-              <h2>Built on Precision, Driven by Purpose</h2>
+          <div ref={storyRef} className={`story-inner ${storyVisible ? 'revealed' : ''}`}>
+
+            <div className="story-content">
+              <span className="section-tag">Our Story</span>
+              <h2>Built on Precision,<br />Driven by Purpose</h2>
               <p>
-                Leona Tech & Geo Solutions was born from a simple belief: that India's infrastructure boom deserved better spatial data — faster, more accurate, and more accessible than traditional survey methods could provide.
+                Leona Tech was founded with a clear mission — to bring
+                engineering-grade geospatial intelligence to India's rapidly
+                growing infrastructure sector. What started as a small drone
+                survey operation in Chennai has grown into a full-service
+                geospatial company trusted by municipal corporations, mining
+                firms, and government bodies across South India.
               </p>
               <p>
-                Starting with a single drone and a team of three in 2020, we've grown into a full-service geospatial firm trusted by government bodies, private developers, and environmental agencies. Our DGCA-certified pilots and GIS analysts work as a seamless unit, from flight planning to final deliverable.
+                We believe that accurate data is the foundation of every great
+                infrastructure project. Our team of DGCA-certified pilots and
+                GIS analysts work together to deliver not just data, but insights
+                that drive better planning and smarter decisions.
               </p>
-              <p>
-                Today, we operate across Tamil Nadu, Karnataka, and Andhra Pradesh — covering thousands of hectares for highway projects, urban planning studies, industrial site surveys, and environmental impact assessments.
-              </p>
-              <div style={{ marginTop: 28, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {['Precision-first approach', 'Certified pilots & analysts', 'End-to-end delivery', 'Client-focused outcomes'].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, background: 'var(--teal-50)', border: '1px solid var(--teal-100)', borderRadius: 8, padding: '7px 12px' }}>
-                    <span style={{ color: 'var(--teal-600)', width: 14, height: 14, flexShrink: 0, display: 'flex' }}><IconCheck /></span>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--teal-800)' }}>{item}</span>
-                  </div>
-                ))}
-              </div>
+              <button className="btn-secondary" style={{ marginTop: '24px' }} onClick={() => navigate('contact')}>
+                Get in Touch
+              </button>
             </div>
 
-            {/* Timeline */}
             <div className="story-timeline">
-              {timeline.map((t, i) => (
-                <div className="timeline-item reveal" key={i} style={{ transitionDelay: `${i * 0.1}s` }}>
-                  <div className={`timeline-dot${t.active ? ' active' : ''}`}>
-                    <IconCheck />
+              {TIMELINE.map((item, i) => (
+                <div key={i} className="timeline-item">
+                  <div className={`timeline-dot ${item.active ? 'active' : ''}`}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {item.active
+                        ? <polyline points="20 6 9 17 4 12"/>
+                        : <circle cx="12" cy="12" r="4"/>
+                      }
+                    </svg>
                   </div>
                   <div className="timeline-body">
-                    <div className="timeline-year">{t.year}</div>
-                    <h4>{t.title}</h4>
-                    <p>{t.desc}</p>
+                    <div className="timeline-year">{item.year}</div>
+                    <h4>{item.title}</h4>
+                    <p>{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* ══ MISSION & VISION ══ */}
+      {/* ══ MISSION / VISION ══════════════════════════════ */}
       <section className="mission-section">
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div className="section-tag reveal">Our Purpose</div>
-            <h2 className="section-title reveal">Mission & <span>Vision</span></h2>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <span className="section-tag">What Drives Us</span>
+            <h2 className="section-title">Mission & Vision</h2>
           </div>
-          <div className="mission-grid">
-            <div className="mission-card mission reveal">
-              <div className="mission-card-icon"><IconTarget /></div>
+          <div ref={missionRef} className={`mission-grid ${missionVisible ? 'revealed' : ''}`}>
+            <div className="mission-card mission">
+              <div className="mission-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
               <h3>Our Mission</h3>
               <p>
-                To deliver the most accurate, efficient, and reliable geospatial data services in India — empowering engineers, planners, and decision-makers with the spatial intelligence they need to build better infrastructure and protect natural environments.
+                To deliver high-accuracy, technology-driven geospatial solutions
+                that empower infrastructure planners, government bodies, and
+                private enterprises with actionable spatial intelligence —
+                making India's development faster, smarter, and more efficient.
               </p>
             </div>
-            <div className="mission-card vision reveal">
-              <div className="mission-card-icon"><IconEye /></div>
+            <div className="mission-card vision">
+              <div className="mission-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
               <h3>Our Vision</h3>
               <p>
-                To be India's most trusted name in drone-based geospatial services — recognized for our precision, innovation, and commitment to sustainable development. We envision a future where accurate spatial data is accessible to every project, regardless of size or geography.
+                To become India's most trusted geospatial intelligence partner —
+                setting the benchmark for drone survey accuracy, GIS output
+                quality, and project delivery speed across infrastructure,
+                urban planning, and environmental sectors.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══ TEAM ══ */}
+      {/* ══ TEAM ══════════════════════════════════════════ */}
       <section className="team-section">
         <div className="container">
-          <div style={{ textAlign: 'center' }}>
-            <div className="section-tag reveal">The Team</div>
-            <h2 className="section-title reveal">The People Behind <span>Every Survey</span></h2>
-            <p className="section-subtitle reveal" style={{ margin: '12px auto 0' }}>
-              Our team of certified pilots, GIS analysts, and project managers bring deep domain expertise to every engagement.
-            </p>
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <span className="section-tag">The Team</span>
+            <h2 className="section-title">People Behind the Precision</h2>
           </div>
-          <div className="team-grid">
-            {team.map((m, i) => (
-              <div className="team-card reveal" key={i} style={{ transitionDelay: `${i * 0.12}s` }}>
+          <div ref={teamRef} className={`team-grid ${teamVisible ? 'revealed' : ''}`}>
+            {TEAM.map((m, i) => (
+              <div key={i} className="team-card">
                 <div className="team-avatar">{m.initials}</div>
                 <h4>{m.name}</h4>
-                <div className="role">{m.role}</div>
+                <p className="role">{m.role}</p>
                 <p className="bio">{m.bio}</p>
               </div>
             ))}
@@ -187,17 +244,19 @@ export default function AboutPage({ navigate }) {
         </div>
       </section>
 
-      {/* ══ CERTIFICATIONS ══ */}
+      {/* ══ CERTIFICATIONS ════════════════════════════════ */}
       <section className="certs-section">
         <div className="container">
-          <div style={{ textAlign: 'center' }}>
-            <div className="section-tag reveal">Credentials</div>
-            <h2 className="section-title reveal">Certified & <span>Compliant</span></h2>
+          <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+            <span className="section-tag">Credentials</span>
+            <h2 className="section-title">Certified & Compliant</h2>
           </div>
-          <div className="certs-grid">
-            {certs.map((c, i) => (
-              <div className="cert-badge reveal" key={i} style={{ transitionDelay: `${i * 0.1}s` }}>
-                <div className="cert-badge-icon">{c.icon}</div>
+          <div ref={certsRef} className={`certs-grid ${certsVisible ? 'revealed' : ''}`}>
+            {CERTS.map((c, i) => (
+              <div key={i} className="cert-badge">
+                <div className="cert-badge-icon">
+                  <span style={{ fontSize: '1.1rem' }}>{c.icon}</span>
+                </div>
                 <div className="cert-badge-text">
                   <h5>{c.title}</h5>
                   <p>{c.sub}</p>
@@ -208,30 +267,36 @@ export default function AboutPage({ navigate }) {
         </div>
       </section>
 
-      {/* ══ CTA ══ */}
+      {/* ══ CTA ═══════════════════════════════════════════ */}
       <section className="cta-section">
         <div className="container">
-          <div className="cta-inner reveal">
+          <div className="cta-inner revealed">
             <div className="cta-text">
-              <div className="section-tag">Start a Project</div>
-              <h2>Ready to Work Together?</h2>
-              <p>Tell us about your project and we'll provide a free consultation and detailed quote within 24 hours.</p>
+              <span className="section-tag">Let's Work Together</span>
+              <h2>Ready to Start Your Project?</h2>
+              <p>
+                Talk to our survey engineers today and get a free site
+                assessment for your next project.
+              </p>
             </div>
             <div className="cta-actions">
-              <button className="btn-primary" onClick={() => navigate('contact')}>
-                Contact Us <IconArrow />
+              <button className="btn-teal" onClick={() => navigate('contact')}>
+                Contact Us
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
               </button>
-              <button
-                className="btn-secondary"
-                style={{ background: 'transparent', color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.2)' }}
-                onClick={() => navigate('home')}
-              >
-                View Services
+              <button className="btn-secondary" onClick={() => navigate('services')}>
+                Our Services
               </button>
             </div>
           </div>
         </div>
       </section>
-    </main>
+
+    </div>
   );
-}
+};
+
+export default AboutPage;
